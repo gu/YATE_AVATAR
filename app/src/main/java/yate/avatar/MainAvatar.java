@@ -51,7 +51,7 @@ public class MainAvatar extends FragmentActivity
 
 
     /**
-     * Google Maps Methods
+     * Google Maps Methods  wololol
      */
 
     private void setUpMapIfNeeded() {
