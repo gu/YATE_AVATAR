@@ -1,9 +1,12 @@
 package yate.avatar;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -22,10 +25,20 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MainAvatar extends FragmentActivity
         implements FragmentNavDrawer.NavigationDrawerCallbacks {
 
+    //Constants
+    public static final String TAG = "MainAvatar";
+    public static final String AUTHORITY = "yate.avatar.syncadapter";
+    public static final String ACCOUNT_TYPE = "example.com";
+    public static final String ACCOUNT = "dummyaccount";
+
+
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+
     private FragmentNavDrawer mFragmentNavDrawer;
 
     private CharSequence mTitle;
+
+    Account myAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,12 +54,37 @@ public class MainAvatar extends FragmentActivity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout)
         );
+
+        myAccount = CreateSyncAccount(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
+    }
+
+    /**
+     * SyncAdapter methods
+     */
+    public static Account CreateSyncAccount(Context context) {
+        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+        AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
+
+        if (accountManager.addAccountExplicitly(newAccount, null, null)) {
+           /*
+             * If you don't set android:syncable="true" in
+             * in your <provider> element in the manifest,
+             * then call context.setIsSyncable(account, AUTHORITY, 1)
+             * here.
+             */
+        } else {
+            /*
+             * The account exists or some other error occurred. Log this, report it,
+             * or handle it internally.
+             */
+        }
+        return newAccount;
     }
 
 

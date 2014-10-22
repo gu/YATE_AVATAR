@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 
 /**
- * Created by Lou on 10/21/2014.
+ * Created by Freddy on 10/21/2014.
  */
 public class AuthenticatorService extends Service {
 

@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 /**
- * Created by Lou on 10/21/2014.
+ * Created by Freddy on 10/21/2014.
  */
 public class Authenticator extends AbstractAccountAuthenticator {
 
