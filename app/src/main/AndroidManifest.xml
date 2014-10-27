@@ -18,8 +18,8 @@
         </activity>
 
         <provider
-            android:name=".syncadapter.ContentProviderStub"
-            android:authorities="yate.avatar.syncadapter"
+            android:name=".provider.AvatarProvider"
+            android:authorities="yate.avatar.provider.AvatarProvider"
             android:exported="false"
             android:syncable="true" />
 
