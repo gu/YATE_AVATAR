@@ -6,10 +6,13 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,13 +24,20 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.apache.http.auth.AUTH;
+
+import yate.avatar.provider.Avatar;
+import yate.avatar.syncadapter.SyncAdapter;
+import yate.avatar.provider.AvatarDatabaseHelper;
+
 
 public class MainAvatar extends FragmentActivity
         implements FragmentNavDrawer.NavigationDrawerCallbacks {
 
+
     //Constants
     public static final String TAG = "MainAvatar";
-    public static final String AUTHORITY = "yate.avatar.syncadapter";
+    public static final String AUTHORITY = "com.avatar";
     public static final String ACCOUNT_TYPE = "example.com";
     public static final String ACCOUNT = "dummyaccount";
 
@@ -38,13 +48,15 @@ public class MainAvatar extends FragmentActivity
 
     private CharSequence mTitle;
 
+//    AvatarDatabaseHelper db = new AvatarDatabaseHelper(this);
+
     Account myAccount;
+    AccountManager mAccountManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        setUpMapIfNeeded();
 
         mFragmentNavDrawer = (FragmentNavDrawer)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -55,7 +67,26 @@ public class MainAvatar extends FragmentActivity
                 (DrawerLayout) findViewById(R.id.drawer_layout)
         );
 
+
+
+
+        mAccountManager = AccountManager.get(this);
+
+        //Temporary for manual sync
+        Bundle settingsBundle = new Bundle();
+        settingsBundle.putBoolean(
+                ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(
+                ContentResolver.SYNC_EXTRAS_EXPEDITED, true
+        );
+
+        myAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
         myAccount = CreateSyncAccount(this);
+
+        ContentResolver.requestSync(myAccount, Constants.AUTHORITY, settingsBundle);
+        SyncAdapter blah = new SyncAdapter(this, true);
+        blah.onPerformSync(myAccount, null, AUTHORITY, null, null);
+        setUpMapIfNeeded();
     }
 
     @Override
@@ -68,21 +99,21 @@ public class MainAvatar extends FragmentActivity
      * SyncAdapter methods
      */
     public static Account CreateSyncAccount(Context context) {
-        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
         AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
+        for (int i = 0; i < accountManager.getAccounts().length; i++) {
+            Log.d(Constants.LOG_ID, TAG + "> " +  i + " " + accountManager.getAccounts()[i].toString());
+
+        }
+        Log.d(Constants.LOG_ID, TAG + "> in CreateSyncAccount");
+        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+        Log.d(Constants.LOG_ID, TAG + "> " + newAccount.toString());
 
         if (accountManager.addAccountExplicitly(newAccount, null, null)) {
-           /*
-             * If you don't set android:syncable="true" in
-             * in your <provider> element in the manifest,
-             * then call context.setIsSyncable(account, AUTHORITY, 1)
-             * here.
-             */
+            Log.d(Constants.LOG_ID, TAG + "> Added successfully");
+            ContentResolver.setSyncAutomatically(newAccount, AUTHORITY, true);
+            ContentResolver.setIsSyncable(newAccount, AUTHORITY, 1);
         } else {
-            /*
-             * The account exists or some other error occurred. Log this, report it,
-             * or handle it internally.
-             */
+            Log.d(Constants.LOG_ID, TAG + "> Exist or Error");
         }
         return newAccount;
     }
@@ -107,7 +138,18 @@ public class MainAvatar extends FragmentActivity
 
 
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        Cursor mCursor = getContentResolver().query(Avatar.PointContent.CONTENT_URI, null, null, null, null);
+        if(mCursor.moveToNext()) {
+            Log.d(Constants.LOG_ID, TAG + ">" + mCursor.getCount());
+            do {
+                mMap.addMarker(new MarkerOptions().position(
+                        new LatLng(mCursor.getDouble(Constants.LATITUDE_INDEX),
+                                mCursor.getDouble(Constants.LONGITUDE_INDEX)))
+                        .title(mCursor.getString(Constants.NAME_INDEX)));
+            } while (mCursor.moveToNext());
+        }
+//        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+//        mMap.addMarker(new MarkerOptions().position(new LatLng(40.0369697, -82.8894337)).title("Home"));
     }
 
     /**

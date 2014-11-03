@@ -10,8 +10,11 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.util.HashMap;
+
+import yate.avatar.Constants;
 
 /**
  * The main ContentProvider for AVATAR
@@ -22,6 +25,8 @@ import java.util.HashMap;
 public class AvatarProvider extends ContentProvider {
 
     private AvatarDatabaseHelper dbHelper;
+
+    private static final String TAG = "AvatarProvider";
 
     // For the UriMatcher
     private static final int POINTS = 100;
@@ -38,13 +43,13 @@ public class AvatarProvider extends ContentProvider {
         uriMatcher.addURI(Avatar.AUTHORITY, "points/*", POINT_ID);  // For a specific point
 
         pointsProjectionMap = new HashMap<String, String>();
-        pointsProjectionMap.put(Avatar.Point._ID, Avatar.Point._ID);
-        pointsProjectionMap.put(Avatar.Point.COL_NAME, Avatar.Point.COL_NAME);
-        pointsProjectionMap.put(Avatar.Point.COL_LAT, Avatar.Point.COL_LAT);
-        pointsProjectionMap.put(Avatar.Point.COL_LONG, Avatar.Point.COL_LONG);
-        pointsProjectionMap.put(Avatar.Point.COL_ALTITUDE, Avatar.Point.COL_ALTITUDE);
-        pointsProjectionMap.put(Avatar.Point.COL_UPLOAD_DATE, Avatar.Point.COL_UPLOAD_DATE);
-        pointsProjectionMap.put(Avatar.Point.COL_LINK, Avatar.Point.COL_LINK);
+        pointsProjectionMap.put(Avatar.PointContent._ID, Avatar.PointContent._ID);
+        pointsProjectionMap.put(Avatar.PointContent.COL_NAME, Avatar.PointContent.COL_NAME);
+        pointsProjectionMap.put(Avatar.PointContent.COL_LAT, Avatar.PointContent.COL_LAT);
+        pointsProjectionMap.put(Avatar.PointContent.COL_LONG, Avatar.PointContent.COL_LONG);
+        pointsProjectionMap.put(Avatar.PointContent.COL_ALTITUDE, Avatar.PointContent.COL_ALTITUDE);
+        pointsProjectionMap.put(Avatar.PointContent.COL_UPLOAD_DATE, Avatar.PointContent.COL_UPLOAD_DATE);
+        pointsProjectionMap.put(Avatar.PointContent.COL_LINK, Avatar.PointContent.COL_LINK);
     }
 
     @Override
@@ -55,18 +60,21 @@ public class AvatarProvider extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        Log.d(Constants.LOG_ID, TAG + "> In query");
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
-        builder.setTables(Avatar.Point.TABLE_NAME);
+        builder.setTables(Avatar.PointContent.TABLE_NAME);
         builder.setProjectionMap(pointsProjectionMap);
 
         final int match = uriMatcher.match(uri);
         switch (match) {
             case POINTS:
+                Log.d(Constants.LOG_ID, TAG + "> POINTS match");
                 // Do nothing, just getting all of the points
                 break;
             case POINT_ID:
+                Log.d(Constants.LOG_ID, TAG + "> POINT_ID match");
                 // Get the point in question via its unique id
-                builder.appendWhere(Avatar.Point._ID + "=" + uri.getLastPathSegment());
+                builder.appendWhere(Avatar.PointContent._ID + "=" + uri.getLastPathSegment());
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
@@ -74,7 +82,7 @@ public class AvatarProvider extends ContentProvider {
 
         String orderBy;
         if (TextUtils.isEmpty(sortOrder)) {
-            orderBy = Avatar.Point.DEFAULT_SORT_ORDER;
+            orderBy = Avatar.PointContent.DEFAULT_SORT_ORDER;
         } else {
             orderBy = sortOrder;
         }
@@ -95,8 +103,8 @@ public class AvatarProvider extends ContentProvider {
         final int match = uriMatcher.match(uri);
         switch (match) {
             case POINTS:
-                id = db.insertOrThrow(Avatar.Point.TABLE_NAME, null, contentValues);
-                result = ContentUris.withAppendedId(Avatar.Point.CONTENT_URI, id);
+                id = db.insertOrThrow(Avatar.PointContent.TABLE_NAME, null, contentValues);
+                result = ContentUris.withAppendedId(Avatar.PointContent.CONTENT_URI, id);
                 break;
         }
 
@@ -116,14 +124,14 @@ public class AvatarProvider extends ContentProvider {
         final int match = uriMatcher.match(uri);
         switch (match) {
             case POINTS:
-                rows = db.update(Avatar.Point.TABLE_NAME, contentValues, selection, selectionArgs);
+                rows = db.update(Avatar.PointContent.TABLE_NAME, contentValues, selection, selectionArgs);
                 break;
             case POINT_ID:
                 String pointId = uri.getLastPathSegment();
 
                 // In case there's a selection AND a point id, might as well use them both
-                rows = db.update(Avatar.Point.TABLE_NAME, contentValues,
-                        Avatar.Point._ID + "=" + pointId
+                rows = db.update(Avatar.PointContent.TABLE_NAME, contentValues,
+                        Avatar.PointContent._ID + "=" + pointId
                         + (!TextUtils.isEmpty(selection) ? " AND (" + selection + ")" : ""),
                         selectionArgs);
                 break;
@@ -141,14 +149,14 @@ public class AvatarProvider extends ContentProvider {
         final int match = uriMatcher.match(uri);
         switch (match) {
             case POINTS:
-                rows = db.delete(Avatar.Point.TABLE_NAME, selection, selectionArgs);
+                rows = db.delete(Avatar.PointContent.TABLE_NAME, selection, selectionArgs);
                 break;
             case POINT_ID:
                 String pointId = uri.getLastPathSegment();
 
                 // In case there's a selection AND a point id, might as well use them both
-                rows = db.delete(Avatar.Point.TABLE_NAME,
-                        Avatar.Point._ID + "=" + pointId
+                rows = db.delete(Avatar.PointContent.TABLE_NAME,
+                        Avatar.PointContent._ID + "=" + pointId
                                 + (!TextUtils.isEmpty(selection) ? " AND (" + selection + ")" : ""),
                         selectionArgs);
                 break;
@@ -163,12 +171,14 @@ public class AvatarProvider extends ContentProvider {
         final int match = uriMatcher.match(uri);
         switch (match) {
             case POINTS:
-                return Avatar.Point.CONTENT_TYPE;
+                return Avatar.PointContent.CONTENT_TYPE;
             case POINT_ID:
-                return Avatar.Point.CONTENT_ITEM_TYPE;
+                return Avatar.PointContent.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
     }
+
+
 
 }

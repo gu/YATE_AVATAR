@@ -3,18 +3,27 @@ package yate.avatar.syncadapter;
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
+import android.accounts.AccountManager;
 import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+
+import yate.avatar.Constants;
+import yate.avatar.MainAvatar;
 
 /**
  * Created by Freddy on 10/21/2014.
  */
 public class Authenticator extends AbstractAccountAuthenticator {
 
+    private static final String TAG = "Authenticator";
+    private final Context context;
+
     public Authenticator(Context context) {
         super(context);
+        this.context = context;
     }
 
 
@@ -27,7 +36,10 @@ public class Authenticator extends AbstractAccountAuthenticator {
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType,
                              String authTokenType, String[] requiredFeatures,
                              Bundle options) throws NetworkErrorException {
-        throw new UnsupportedOperationException();
+
+        Log.d(Constants.LOG_ID, TAG + "> adding account");
+//        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override

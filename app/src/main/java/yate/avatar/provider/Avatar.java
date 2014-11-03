@@ -12,11 +12,11 @@ public final class Avatar {
     private Avatar() {
     }
 
-    public static final String AUTHORITY = "yate.avatar.provider.AvatarProvider";
+    public static final String AUTHORITY = "com.avatar";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
     // Populate it with the a class that has contants for database columns
-    public static final class Point implements BaseColumns {
+    public static final class PointContent implements BaseColumns {
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath("points").build();
 
         // Database columns
