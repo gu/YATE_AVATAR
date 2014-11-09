@@ -23,8 +23,8 @@ public class MainAvatar extends ActionBarActivity
 
     //Constants
     public static final String TAG = "MainAvatar";
-    public static final String AUTHORITY = "com.avatar";
-    public static final String ACCOUNT_TYPE = "example.com";
+    public static final String AUTHORITY = "yate.avatar.contentprovider";
+    public static final String ACCOUNT_TYPE = "yate.avatar";
     public static final String ACCOUNT = "dummyaccount";
 
 
@@ -56,18 +56,13 @@ public class MainAvatar extends ActionBarActivity
 
         //Temporary for manual sync
         Bundle settingsBundle = new Bundle();
-        settingsBundle.putBoolean(
-                ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        settingsBundle.putBoolean(
-                ContentResolver.SYNC_EXTRAS_EXPEDITED, true
-        );
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
 
         myAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
         myAccount = CreateSyncAccount(this);
 
         ContentResolver.requestSync(myAccount, Constants.AUTHORITY, settingsBundle);
-        SyncAdapter blah = new SyncAdapter(this, true);
-        blah.onPerformSync(myAccount, null, AUTHORITY, null, null);
     }
 
     @Override
@@ -87,6 +82,8 @@ public class MainAvatar extends ActionBarActivity
         Log.d(Constants.LOG_ID, TAG + "> in CreateSyncAccount");
         Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
         Log.d(Constants.LOG_ID, TAG + "> " + newAccount.toString());
+        ContentResolver.setSyncAutomatically(newAccount, AUTHORITY, true);
+        ContentResolver.setIsSyncable(newAccount, AUTHORITY, 1);
 
         if (accountManager.addAccountExplicitly(newAccount, null, null)) {
             Log.d(Constants.LOG_ID, TAG + "> Added successfully");

@@ -1,9 +1,11 @@
-package yate.avatar.provider;
+package yate.avatar.syncadapter;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.google.android.gms.maps.model.LatLng;
+
+import yate.avatar.contentprovider.Avatar;
 
 /**
  *
@@ -67,6 +69,14 @@ public class Point {
 
     public void setCoord(double lat, double lng) {
         this.lat = lat;
+        this.lng = lng;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public void setLng(double lng) {
         this.lng = lng;
     }
 

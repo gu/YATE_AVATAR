@@ -41,14 +41,14 @@
         </activity>
 
         <provider
-            android:name=".provider.AvatarProvider"
-            android:authorities="com.avatar"
+            android:name=".contentprovider.AvatarProvider"
+            android:authorities="yate.avatar.contentprovider"
             android:exported="false"
             android:syncable="true" />
 
 
         <service
-            android:name=".syncadapter.AuthenticatorService">
+            android:name=".authenticator.AuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
@@ -74,7 +74,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyCCksI-z4guuPMuErM6wnXCKAdP-DrOLYk" />
+            android:value="AIzaSyDzXxjc6eHiamg6zm4PiJZYHOoBICUbenA" />
         <!-- Mohit's key: AIzaSyCCksI-z4guuPMuErM6wnXCKAdP-DrOLYk -->
         <!-- Freddy's key: AIzaSyDzXxjc6eHiamg6zm4PiJZYHOoBICUbenA-->
     </application>

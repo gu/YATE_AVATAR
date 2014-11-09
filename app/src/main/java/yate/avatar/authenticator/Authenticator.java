@@ -1,4 +1,4 @@
-package yate.avatar.syncadapter;
+package yate.avatar.authenticator;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;

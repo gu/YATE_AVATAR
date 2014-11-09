@@ -1,4 +1,4 @@
-package yate.avatar.syncadapter;
+package yate.avatar.authenticator;
 
 import android.app.Service;
 import android.content.Intent;

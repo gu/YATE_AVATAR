@@ -1,4 +1,4 @@
-package yate.avatar.provider;
+package yate.avatar.contentprovider;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -134,7 +134,7 @@ public class AvatarProvider extends ContentProvider {
                 // In case there's a selection AND a point id, might as well use them both
                 rows = db.update(Avatar.PointContent.TABLE_NAME, contentValues,
                         Avatar.PointContent._ID + "=" + pointId
-                        + (!TextUtils.isEmpty(selection) ? " AND (" + selection + ")" : ""),
+                                + (!TextUtils.isEmpty(selection) ? " AND (" + selection + ")" : ""),
                         selectionArgs);
                 break;
         }

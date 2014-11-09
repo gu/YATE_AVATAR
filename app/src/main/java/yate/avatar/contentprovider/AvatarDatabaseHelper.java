@@ -1,4 +1,4 @@
-package yate.avatar.provider;
+package yate.avatar.contentprovider;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

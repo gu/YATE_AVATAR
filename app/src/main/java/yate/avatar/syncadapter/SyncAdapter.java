@@ -1,6 +1,5 @@
 package yate.avatar.syncadapter;
 
-import com.google.gson.Gson;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.AbstractThreadedSyncAdapter;
@@ -11,23 +10,25 @@ import android.content.Context;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.JsonReader;
 import android.util.Log;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import yate.avatar.Constants;
-import yate.avatar.provider.Point;
-import yate.avatar.provider.Avatar;
+import yate.avatar.PointsMapFragment;
+import yate.avatar.contentprovider.Avatar;
 
 /**
  * Handle the transfer of data between a server and an
@@ -78,29 +79,33 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority,
                               ContentProviderClient provider, SyncResult syncResult) {
         // Do everything here.
-        Log.d(Constants.LOG_ID, TAG + ">In perform sync yo");
+        Log.d(Constants.LOG_ID, TAG + ">In perform sync");
         try {
-//            String authToken = accountManager.blockingGetAuthToken(account, Constants.AUTHTOKEN_TYPE_FULL_ACCESS, true);
-//            String userObjectId = accountManager.getUserData(account, Constants.USERDATA_USER_OBJ_ID);
 
             // Get external points
+            Log.d(Constants.LOG_ID, TAG + ">Calling GetPoints");
             List<Point> remotePoints = getPoints();
+            Log.d(Constants.LOG_ID, TAG + "> remotePoints length: " + remotePoints.size());
 
             // Get internal points
-            ArrayList<Point> localPoints = new ArrayList<Point>();
-            Cursor curPoints = provider.query(Avatar.PointContent.CONTENT_URI, null, null, null, null);
+            List<Point> localPoints = new ArrayList<Point>();
+            Cursor curPoints = contentResolver.query(Avatar.PointContent.CONTENT_URI, null, null, null, null);
             if (curPoints != null) {
                 while (curPoints.moveToNext()) {
                     localPoints.add(Point.fromCursor(curPoints));
                 }
                 curPoints.close();
+            } else {
+                Log.d(Constants.LOG_ID, TAG + "> curPoints is null");
             }
+            Log.d(Constants.LOG_ID, TAG + "> localPoints length: " + localPoints.size());
 
             // See what local points are missing on remote
             ArrayList<Point> pointsToRemote = new ArrayList<Point>();
             for (Point p : localPoints) {
                 if (!remotePoints.contains(p))
                     pointsToRemote.add(p);
+                Log.d(Constants.LOG_ID, TAG + ">  " + p.getName());
             }
 
             // See what remote points are missing on local
@@ -131,35 +136,38 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     pointsToLocalValues[i++] = p.getContentValues();
                 }
                 provider.bulkInsert(Avatar.PointContent.CONTENT_URI, pointsToLocalValues);
+                //Temporary way to display points.
+                //TODO: Implement a better way to display updated points.  This doesn't actually work.
+                new PointsMapFragment().displayPoints();
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public List<Point> getPoints() {
-        Log.d(Constants.LOG_ID, TAG + "> Getting points");
+        List<Point> lPoints;
 
-        DefaultHttpClient httpClient = new DefaultHttpClient();
+        HttpClient httpClient = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(Constants.POINT_DATABASE_URL_JSON + "/jsonOutput.php");
         try {
-            Log.d(Constants.LOG_ID, TAG + "> something " + httpGet.getURI().toURL().toString());
+            Log.d(Constants.LOG_ID, TAG + "> Connecting to " + httpGet.getURI().toURL().toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
         try {
-            Log.d(Constants.LOG_ID, TAG + ">trying my hardest");
+            Log.d(Constants.LOG_ID, TAG + "> Trying to get points");
             HttpResponse response = httpClient.execute(httpGet);
-            String responseString = EntityUtils.toString(response.getEntity());
-            Log.d(Constants.LOG_ID, TAG + "> httpget response " + responseString);
+            InputStream responseStream = response.getEntity().getContent();
 
             if (response.getStatusLine().getStatusCode() != HttpURLConnection.HTTP_OK) {
                 throw new Exception("error retreving points");
             }
 
-            Points points = new Gson().fromJson(responseString, Points.class);
-            Log.d(Constants.LOG_ID, TAG + "> Points length " + points.results.size());
-            return points.results;
+            //TODO: Use GSON library instead of manually converting data.
+            lPoints = jsonToList(responseStream);
+            return lPoints;
         } catch (IOException e) {
 
             e.printStackTrace();
@@ -170,7 +178,51 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         return new ArrayList<Point>();
     }
 
-    private class Points implements Serializable {
-        List<Point> results;
+    private List<Point> jsonToList(InputStream jsonString) {
+        List<Point> lPoints = new ArrayList<Point>();
+
+        JsonReader jReader = new JsonReader(new InputStreamReader(jsonString));
+
+        try {
+            jReader.beginArray();
+            while (jReader.hasNext()) {
+                jReader.beginObject();
+                Point pNext = new Point();
+                while (jReader.hasNext()) {
+                    String key = jReader.nextName();
+                    if (key.equalsIgnoreCase(Avatar.PointContent.COL_NAME)) {
+                        pNext.setName(jReader.nextString());
+                    } else if (key.equalsIgnoreCase(Avatar.PointContent.COL_LAT)) {
+                        pNext.setLat(jReader.nextDouble());
+                    } else if (key.equalsIgnoreCase(Avatar.PointContent.COL_LONG)) {
+                        pNext.setLng(jReader.nextDouble());
+                    } else if (key.equalsIgnoreCase(Avatar.PointContent.COL_ALTITUDE)) {
+                        pNext.setAlt(jReader.nextDouble());
+                    } else if (key.equalsIgnoreCase(Avatar.PointContent.COL_UPLOAD_DATE)) {
+                        pNext.setDate(jReader.nextString());
+                    } else if (key.equalsIgnoreCase(Avatar.PointContent.COL_LINK)) {
+                        pNext.setLink(jReader.nextString());
+                    } else {
+                        jReader.skipValue();
+                    }
+                }
+                lPoints.add(pNext);
+                jReader.endObject();
+            }
+            jReader.endArray();
+            jReader.close();
+        } catch (IllegalStateException e) {
+            try {
+                Log.d(Constants.LOG_ID, TAG + "> ISE CAUGHT: ");
+                jReader.skipValue();
+            } catch (IOException f) {
+                f.printStackTrace();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return lPoints;
     }
 }

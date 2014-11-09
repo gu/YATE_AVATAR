@@ -17,7 +17,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import yate.avatar.provider.Avatar;
+import yate.avatar.contentprovider.Avatar;
 
 /**
  * Created by mohitd2000 on 11/7/14.
@@ -69,22 +69,27 @@ public class PointsMapFragment extends MapFragment implements GooglePlayServices
         setUpMap();
     }
 
-    private void setUpMap() {
-        Cursor cursor = getActivity().getContentResolver().query(Avatar.PointContent.CONTENT_URI, null, null, null, null);
+    public void setUpMap() {
+        //Method to clear database on startup.
+        //TODO: Remove this method when a better idea comes along.
+        getActivity().getContentResolver().delete(Avatar.PointContent.CONTENT_URI, null, null);
 
-        if(cursor.moveToNext()) {
-            Log.d(Constants.LOG_ID, TAG + ">" + cursor.getCount());
-            double lat, lng;
-            String name;
-            do {
-                name = cursor.getString(cursor.getColumnIndexOrThrow(Avatar.PointContent.COL_NAME));
-                lat = cursor.getDouble(cursor.getColumnIndexOrThrow(Avatar.PointContent.COL_LAT));
-                lng = cursor.getDouble(cursor.getColumnIndexOrThrow(Avatar.PointContent.COL_LONG));
-                mMap.addMarker(new MarkerOptions().position(
-                        new LatLng(lat, lng)).title(name));
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
+
+//        Cursor cursor = getActivity().getContentResolver().query(Avatar.PointContent.CONTENT_URI, null, null, null, null);
+//
+//        if(cursor.moveToNext()) {
+////            Log.d(Constants.LOG_ID, TAG + ">" + cursor.getCount());
+//            double lat, lng;
+//            String name;
+//            do {
+//                name = cursor.getString(cursor.getColumnIndexOrThrow(Avatar.PointContent.COL_NAME));
+//                lat = cursor.getDouble(cursor.getColumnIndexOrThrow(Avatar.PointContent.COL_LAT));
+//                lng = cursor.getDouble(cursor.getColumnIndexOrThrow(Avatar.PointContent.COL_LONG));
+//                mMap.addMarker(new MarkerOptions().position(
+//                        new LatLng(lat, lng)).title(name));
+//            } while (cursor.moveToNext());
+//        }
+//        cursor.close();
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
         mMap.addMarker(new MarkerOptions().position(new LatLng(40.0369697, -82.8894337)).title("Home"));
     }
@@ -113,8 +118,29 @@ public class PointsMapFragment extends MapFragment implements GooglePlayServices
      */
     @Override
     public void onDisconnected() {
-        // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * Method to display points from database on map.
+     * TODO: Move or find a better system to do this.
+     */
+    public void displayPoints() {
+        Log.d(Constants.LOG_ID, TAG + "> displayPoints");
+        Cursor cursor = getActivity().getContentResolver().query(Avatar.PointContent.CONTENT_URI, null, null, null, null);
+
+        if (cursor.moveToNext()) {
+            Log.d(Constants.LOG_ID, TAG + "> Adding points: " + cursor.getCount());
+            double lat, lng;
+            String name;
+            do {
+                name = cursor.getString(cursor.getColumnIndexOrThrow(Avatar.PointContent.COL_NAME));
+                lat = cursor.getDouble(cursor.getColumnIndexOrThrow(Avatar.PointContent.COL_LAT));
+                lng = cursor.getDouble(cursor.getColumnIndexOrThrow(Avatar.PointContent.COL_LONG));
+                mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)).title(name));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
     }
 
 }

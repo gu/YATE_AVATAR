@@ -1,4 +1,4 @@
-package yate.avatar.provider;
+package yate.avatar.contentprovider;
 
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -12,7 +12,7 @@ public final class Avatar {
     private Avatar() {
     }
 
-    public static final String AUTHORITY = "com.avatar";
+    public static final String AUTHORITY = "yate.avatar.contentprovider";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
     // Populate it with the a class that has constants for database columns
