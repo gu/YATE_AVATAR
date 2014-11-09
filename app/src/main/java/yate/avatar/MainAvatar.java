@@ -28,9 +28,9 @@ public class MainAvatar extends ActionBarActivity
     public static final String ACCOUNT = "dummyaccount";
 
 
-    private FragmentNavDrawer mFragmentNavDrawer;
+    private FragmentNavDrawer fragmentNavDrawer;
 
-    private CharSequence mTitle;
+    private CharSequence title;
 
     private Account myAccount;
     private AccountManager mAccountManager;
@@ -43,11 +43,11 @@ public class MainAvatar extends ActionBarActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mFragmentNavDrawer = (FragmentNavDrawer)
+        fragmentNavDrawer = (FragmentNavDrawer)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
+        title = getTitle();
 
-        mFragmentNavDrawer.setUp(
+        fragmentNavDrawer.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout)
         );
@@ -119,16 +119,16 @@ public class MainAvatar extends ActionBarActivity
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
-                mTitle = getString(R.string.title_section1);
+                title = getString(R.string.title_section1);
                 break;
             case 2:
-                mTitle = getString(R.string.title_section2);
+                title = getString(R.string.title_section2);
                 break;
             case 3:
-                mTitle = getString(R.string.title_section3);
+                title = getString(R.string.title_section3);
                 break;
             case 4:
-                mTitle = "Another section";
+                title = "Another section";
                 break;
         }
     }
@@ -137,12 +137,12 @@ public class MainAvatar extends ActionBarActivity
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
+        actionBar.setTitle(title);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu item) {
-        if (!mFragmentNavDrawer.isDrawerOpen()) {
+        if (!fragmentNavDrawer.isDrawerOpen()) {
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.

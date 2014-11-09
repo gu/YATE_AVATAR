@@ -14,9 +14,9 @@ import yate.avatar.Constants;
  */
 public class SyncService extends Service {
     // Storage for an instance of the sync adapter
-    private static SyncAdapter sSyncAdapter = null;
+    private static SyncAdapter syncAdapter = null;
     // Object to use as a thread-safe lock
-    private static final Object sSyncAdapterLock = new Object();
+    private static final Object LOCK = new Object();
 
     private static final String TAG = "SyncService";
     /*
@@ -30,9 +30,9 @@ public class SyncService extends Service {
          * Set the sync adapter as syncable
          * Disallow parallel syncs
          */
-        synchronized (sSyncAdapterLock) {
-            if (sSyncAdapter == null) {
-                sSyncAdapter = new SyncAdapter(getApplicationContext(), true);
+        synchronized (LOCK) {
+            if (syncAdapter == null) {
+                syncAdapter = new SyncAdapter(getApplicationContext(), true);
             }
         }
     }
@@ -49,6 +49,6 @@ public class SyncService extends Service {
          * in the base class code when the SyncAdapter
          * constructors call super()
          */
-        return sSyncAdapter.getSyncAdapterBinder();
+        return syncAdapter.getSyncAdapterBinder();
     }
 }

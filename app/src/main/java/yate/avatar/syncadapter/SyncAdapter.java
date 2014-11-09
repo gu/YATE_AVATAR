@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import yate.avatar.Constants;
-import yate.avatar.Point;
+import yate.avatar.provider.Point;
 import yate.avatar.provider.Avatar;
 
 /**
@@ -39,8 +39,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     // Global variables
     // Define a variable to contain a content resolver instance
-    ContentResolver mContentResolver;
-    private AccountManager mAccountManager;
+    private ContentResolver contentResolver;
+    private AccountManager accountManager;
 
     /**
      * Set up the sync adapter
@@ -52,8 +52,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
          * If your app uses a content resolver, get an instance of it
          * from the incoming Context
          */
-        mContentResolver = context.getContentResolver();
-        mAccountManager = AccountManager.get(context);
+        contentResolver = context.getContentResolver();
+        accountManager = AccountManager.get(context);
     }
 
     /**
@@ -71,22 +71,22 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
          * If your app uses a content resolver, get an instance of it
          * from the incoming Context
          */
-        mContentResolver = context.getContentResolver();
+        contentResolver = context.getContentResolver();
     }
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
                               ContentProviderClient provider, SyncResult syncResult) {
-        //Do everything here.
+        // Do everything here.
         Log.d(Constants.LOG_ID, TAG + ">In perform sync yo");
         try {
-//            String authToken = mAccountManager.blockingGetAuthToken(account, Constants.AUTHTOKEN_TYPE_FULL_ACCESS, true);
-//            String userObjectId = mAccountManager.getUserData(account, Constants.USERDATA_USER_OBJ_ID);
+//            String authToken = accountManager.blockingGetAuthToken(account, Constants.AUTHTOKEN_TYPE_FULL_ACCESS, true);
+//            String userObjectId = accountManager.getUserData(account, Constants.USERDATA_USER_OBJ_ID);
 
-            //Get external points
+            // Get external points
             List<Point> remotePoints = getPoints();
 
-            //Get internal points
+            // Get internal points
             ArrayList<Point> localPoints = new ArrayList<Point>();
             Cursor curPoints = provider.query(Avatar.PointContent.CONTENT_URI, null, null, null, null);
             if (curPoints != null) {
@@ -96,14 +96,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 curPoints.close();
             }
 
-            //See what local points are missing on remote
+            // See what local points are missing on remote
             ArrayList<Point> pointsToRemote = new ArrayList<Point>();
             for (Point p : localPoints) {
                 if (!remotePoints.contains(p))
                     pointsToRemote.add(p);
             }
 
-            //See what remote points are missing on local
+            // See what remote points are missing on local
             ArrayList<Point> pointsToLocal = new ArrayList<Point>();
             for (Point p : remotePoints) {
                 if (!localPoints.contains(p)) {
@@ -116,7 +116,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             } else {
                 Log.d(Constants.LOG_ID, TAG + ">Updating remote server with local changes");
 
-                //TODO: Add functionality to upload the points to database
+                // TODO: Add functionality to upload the points to database
             }
 
             if (pointsToLocal.size() == 0) {

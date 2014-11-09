@@ -74,13 +74,17 @@ public class PointsMapFragment extends MapFragment implements GooglePlayServices
 
         if(cursor.moveToNext()) {
             Log.d(Constants.LOG_ID, TAG + ">" + cursor.getCount());
+            double lat, lng;
+            String name;
             do {
+                name = cursor.getString(cursor.getColumnIndexOrThrow(Avatar.PointContent.COL_NAME));
+                lat = cursor.getDouble(cursor.getColumnIndexOrThrow(Avatar.PointContent.COL_LAT));
+                lng = cursor.getDouble(cursor.getColumnIndexOrThrow(Avatar.PointContent.COL_LONG));
                 mMap.addMarker(new MarkerOptions().position(
-                        new LatLng(cursor.getDouble(Constants.LATITUDE_INDEX),
-                                cursor.getDouble(Constants.LONGITUDE_INDEX)))
-                        .title(cursor.getString(Constants.NAME_INDEX)));
+                        new LatLng(lat, lng)).title(name));
             } while (cursor.moveToNext());
         }
+        cursor.close();
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
         mMap.addMarker(new MarkerOptions().position(new LatLng(40.0369697, -82.8894337)).title("Home"));
     }

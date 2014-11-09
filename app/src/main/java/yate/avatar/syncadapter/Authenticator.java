@@ -3,22 +3,19 @@ package yate.avatar.syncadapter;
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
-import android.accounts.AccountManager;
 import android.accounts.NetworkErrorException;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
 import yate.avatar.Constants;
-import yate.avatar.MainAvatar;
 
 /**
  * Created by Freddy on 10/21/2014.
  */
 public class Authenticator extends AbstractAccountAuthenticator {
 
-    private static final String TAG = "Authenticator";
+    private static final String TAG = Authenticator.class.getSimpleName();
     private final Context context;
 
     public Authenticator(Context context) {

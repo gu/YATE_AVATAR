@@ -17,7 +17,9 @@ import java.util.HashMap;
 import yate.avatar.Constants;
 
 /**
- * The main ContentProvider for AVATAR
+ * The main ContentProvider for AVATAR.
+ *
+ * NEVER CHANGE THIS UNLESS YOU MODIFIED THE COLUMNS OF YOUR DATABASE!!!
  *
  * Created by mohitd2000 on 10/27/14.
  *
