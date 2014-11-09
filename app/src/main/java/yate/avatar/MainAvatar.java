@@ -2,36 +2,27 @@ package yate.avatar;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.apache.http.auth.AUTH;
-
 import yate.avatar.provider.Avatar;
 import yate.avatar.syncadapter.SyncAdapter;
-import yate.avatar.provider.AvatarDatabaseHelper;
 
 
-public class MainAvatar extends FragmentActivity
+public class MainAvatar extends ActionBarActivity
         implements FragmentNavDrawer.NavigationDrawerCallbacks {
 
 
@@ -127,8 +118,8 @@ public class MainAvatar extends FragmentActivity
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
+//            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+//                    .getMap();
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 setUpMap();
@@ -188,7 +179,7 @@ public class MainAvatar extends FragmentActivity
     }
 
     public void restoreActionBar() {
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
