@@ -5,7 +5,6 @@ import android.accounts.AccountManager;
 import android.app.FragmentManager;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -15,11 +14,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
-import yate.avatar.provider.Avatar;
 import yate.avatar.syncadapter.SyncAdapter;
 
 
@@ -34,16 +28,12 @@ public class MainAvatar extends ActionBarActivity
     public static final String ACCOUNT = "dummyaccount";
 
 
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-
     private FragmentNavDrawer mFragmentNavDrawer;
 
     private CharSequence mTitle;
 
-//    AvatarDatabaseHelper db = new AvatarDatabaseHelper(this);
-
-    Account myAccount;
-    AccountManager mAccountManager;
+    private Account myAccount;
+    private AccountManager mAccountManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,13 +68,11 @@ public class MainAvatar extends ActionBarActivity
         ContentResolver.requestSync(myAccount, Constants.AUTHORITY, settingsBundle);
         SyncAdapter blah = new SyncAdapter(this, true);
         blah.onPerformSync(myAccount, null, AUTHORITY, null, null);
-        setUpMapIfNeeded();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        setUpMapIfNeeded();
     }
 
     /**
@@ -108,40 +96,6 @@ public class MainAvatar extends ActionBarActivity
             Log.d(Constants.LOG_ID, TAG + "> Exist or Error");
         }
         return newAccount;
-    }
-
-
-    /**
-     * Google Maps Methods  wololol
-     */
-
-    private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap == null) {
-            // Try to obtain the map from the SupportMapFragment.
-//            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-//                    .getMap();
-            // Check if we were successful in obtaining the map.
-            if (mMap != null) {
-                setUpMap();
-            }
-        }
-    }
-
-
-    private void setUpMap() {
-        Cursor mCursor = getContentResolver().query(Avatar.PointContent.CONTENT_URI, null, null, null, null);
-        if(mCursor.moveToNext()) {
-            Log.d(Constants.LOG_ID, TAG + ">" + mCursor.getCount());
-            do {
-                mMap.addMarker(new MarkerOptions().position(
-                        new LatLng(mCursor.getDouble(Constants.LATITUDE_INDEX),
-                                mCursor.getDouble(Constants.LONGITUDE_INDEX)))
-                        .title(mCursor.getString(Constants.NAME_INDEX)));
-            } while (mCursor.moveToNext());
-        }
-//        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-//        mMap.addMarker(new MarkerOptions().position(new LatLng(40.0369697, -82.8894337)).title("Home"));
     }
 
     /**
