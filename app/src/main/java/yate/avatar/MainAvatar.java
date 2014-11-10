@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import yate.avatar.contentprovider.Avatar;
 import yate.avatar.syncadapter.SyncAdapter;
 
 
@@ -63,6 +64,7 @@ public class MainAvatar extends ActionBarActivity
         myAccount = CreateSyncAccount(this);
 
         ContentResolver.requestSync(myAccount, Constants.AUTHORITY, settingsBundle);
+        getContentResolver().delete(Avatar.PointContent.CONTENT_URI, null, null);
     }
 
     @Override

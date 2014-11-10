@@ -10,8 +10,12 @@ import android.content.Context;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.JsonReader;
 import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -27,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import yate.avatar.Constants;
+import yate.avatar.MainAvatar;
 import yate.avatar.PointsMapFragment;
 import yate.avatar.contentprovider.Avatar;
 
@@ -55,6 +60,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
          */
         contentResolver = context.getContentResolver();
         accountManager = AccountManager.get(context);
+
     }
 
     /**
@@ -136,9 +142,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     pointsToLocalValues[i++] = p.getContentValues();
                 }
                 provider.bulkInsert(Avatar.PointContent.CONTENT_URI, pointsToLocalValues);
-                //Temporary way to display points.
-                //TODO: Implement a better way to display updated points.  This doesn't actually work.
-                new PointsMapFragment().displayPoints();
+
             }
 
         } catch (Exception e) {
