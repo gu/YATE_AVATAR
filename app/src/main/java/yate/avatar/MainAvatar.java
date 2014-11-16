@@ -110,7 +110,10 @@ public class MainAvatar extends ActionBarActivity
                         .replace(R.id.container, new PointsMapFragment())
                         .commit();
                 break;
-            case 1:
+            case 2:
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, new PointsListFragment())
+                        .commit();
                 break;
         }
     }
